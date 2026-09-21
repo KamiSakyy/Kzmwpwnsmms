@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="16dp">
+
+    <TextView android:id="@+id/menu_title" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="20dp" android:paddingTop="16dp" android:textStyle="bold" android:textSize="17sp" />
+    <TextView android:id="@+id/menu_artist" style="@style/Text.Row.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="20dp" android:paddingBottom="12dp" />
+
+    <TextView android:id="@+id/menu_play_next" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Играть следующим" />
+    <TextView android:id="@+id/menu_queue" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="В очередь" />
+    <TextView android:id="@+id/menu_fav" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="В избранное" />
+    <TextView android:id="@+id/menu_download_audio" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Скачать аудио" />
+    <TextView android:id="@+id/menu_download_video" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Скачать видео" />
+    <TextView android:id="@+id/menu_offline" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="@string/action_offline" />
+    <TextView android:id="@+id/menu_anime" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="К аниме" />
+    <TextView android:id="@+id/menu_share" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Поделиться" />
+</LinearLayout>

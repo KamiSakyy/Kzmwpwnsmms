@@ -1,0 +1,109 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.anibeat.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.anibeat.app"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+        resConfigs "ru", "en"
+    }
+
+    signingConfigs {
+        release {
+            // Подписываем релиз тем же debug-ключом для CI (APK сразу устанавливается).
+            // Для продакшна замените на свой keystore:
+            //  1) положите файл в android/app/release.keystore
+            //  2) задайте в workflow secrets ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+            //     либо укажите путь через свойство RELEASE_STORE_FILE
+            def customStore = file("release.keystore")
+            def envPath = System.getenv("ANDROID_KEYSTORE_PATH")
+            def storePath = customStore.exists() ? customStore.absolutePath : (envPath ?: "${System.getProperty('user.home')}/.android/debug.keystore")
+            def ksFile = file(storePath)
+            // Если файл ещё не существует (первый запуск), Gradle создаст debug keystore при сборке debug — для release подождёт
+            if (ksFile.exists()) {
+                storeFile ksFile
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: (customStore.exists() ? "anibeat123" : "android")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS") ?: (customStore.exists() ? "anibeat" : "androiddebugkey")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD") ?: (customStore.exists() ? "anibeat123" : "android")
+                println("Signing release with: ${ksFile} alias=${keyAlias}")
+            } else {
+                // Fallback: используем debug signingConfig (будет создан при assembleDebug)
+                println("Release keystore not found at ${ksFile}, will fallback to debug after first build")
+                // Не падаем — вторую попытку сделает workflow (build debug → build release)
+            }
+            // v1 + v2 signing (совместимо с Android 6+)
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Подписываем релиз — теперь APK устанавливается напрямую
+            try {
+                signingConfig signingConfigs.release
+            } catch (Exception e) {
+                println("Warning: release signing not configured, APK будет unsigned: ${e.message}")
+            }
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources.excludes += ["META-INF/*.kotlin_module", "DebugProbesKt.bin"]
+    }
+
+    buildFeatures { viewBinding true }
+}
+
+dependencies {
+    // UI — Material 3, тёмная тема, RecyclerView, ViewPager2
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'androidx.fragment:fragment:1.8.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.palette:palette:1.0.0'     // акцентный цвет из обложки (аналог extractColor)
+
+    // Сеть — как в веб-версии: OkHttp + дисковый кэш + дедупликация запросов
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Медиа — ExoPlayer + MediaSession (управление с экрана блокировки / шторки)
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-session:1.4.1'
+    implementation 'androidx.media3:media3-ui:1.4.1'
+    implementation 'androidx.media3:media3-datasource-okhttp:1.4.1'
+
+    // Glide — загрузка обложек (используется в TrackAdapter, PlayerActivity, Binders)
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+
+    // Guava — ListenableFuture / MoreExecutors для App.java (MediaController)
+    implementation 'com.google.guava:guava:32.1.3-android'
+
+    // Корутины не нужны: всё на Executor + LiveData
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.8.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.8.4'
+    implementation 'androidx.annotation:annotation:1.8.2'
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.AniBeat" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/on_surface</item>
+        <item name="colorOnPrimary">@color/bg</item>
+        <item name="colorSurface">@color/bg</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceVariant">@color/surface2</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="bottomNavigationStyle">@style/Widget.AniBeat.BottomNav</item>
+        <item name="materialSwitchStyle">@style/Widget.AniBeat.Switch</item>
+    </style>
+
+    <style name="Theme.AniBeat.Player" parent="Theme.AniBeat">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+
+    <style name="Theme.AniBeat.BottomSheet" parent="Theme.Material3.Dark.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.AniBeat.BottomSheet</item>
+    </style>
+
+    <style name="Widget.AniBeat.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@color/surface2</item>
+        <item name="shapeAppearanceOverlay">@style/Shape.AniBeat.Sheet</item>
+    </style>
+
+    <style name="Shape.AniBeat.Sheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+    </style>
+
+    <style name="Widget.AniBeat.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/bg</item>
+        <item name="itemIconTint">@color/nav_item</item>
+        <item name="itemTextColor">@color/nav_item</item>
+        <item name="itemActiveIndicatorStyle">@null</item>
+    </style>
+
+    <style name="Widget.AniBeat.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/switch_thumb</item>
+        <item name="trackTint">@color/switch_track</item>
+    </style>
+
+    <!-- Базовый текстовый стиль — родитель для Text.Title / Text.Row (требуется AAPT) -->
+    <style name="Text">
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Title">
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Row">
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Row.Meta">
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="android:textSize">12.5sp</item>
+    </style>
+</resources>

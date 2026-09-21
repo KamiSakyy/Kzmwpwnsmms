@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:background="@drawable/row_normal" android:paddingVertical="7dp" android:paddingStart="16dp" android:paddingEnd="4dp">
+
+    <FrameLayout android:layout_width="50dp" android:layout_height="50dp">
+        <ImageView android:id="@+id/cover" android:layout_width="50dp" android:layout_height="50dp" android:scaleType="centerCrop" android:contentDescription="@null" />
+        <ImageView android:id="@+id/play_icon" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:src="@drawable/ic_play" android:alpha="0.9" />
+        <LinearLayout android:id="@+id/equalizer" android:layout_width="wrap_content" android:layout_height="16dp" android:layout_gravity="center" android:orientation="horizontal" android:visibility="gone">
+            <View android:layout_width="3dp" android:layout_height="10dp" android:background="#FFFFFFFF" android:layout_marginEnd="2dp" />
+            <View android:layout_width="3dp" android:layout_height="16dp" android:background="#FFFFFFFF" android:layout_marginEnd="2dp" />
+            <View android:layout_width="3dp" android:layout_height="12dp" android:background="#FFFFFFFF" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingHorizontal="12dp">
+        <TextView android:id="@+id/title" style="@style/Text.Row" android:maxLines="1" android:ellipsize="end" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+            <TextView android:id="@+id/tag" style="@style/Text.Row.Meta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/tag_op" android:paddingHorizontal="6dp" android:paddingVertical="1dp" android:textStyle="bold" android:textSize="10sp" />
+            <TextView android:id="@+id/nsfw" style="@style/Text.Row.Meta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="18+" android:textColor="#FFFF6B62" android:visibility="gone" />
+            <TextView android:id="@+id/meta" style="@style/Text.Row.Meta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="6dp" android:maxLines="1" android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView android:id="@+id/index" style="@style/Text.Row.Meta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
+    <ImageView android:id="@+id/more" android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_play" android:rotation="90" android:alpha="0.6" android:contentDescription="@null" />
+</LinearLayout>

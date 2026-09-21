@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+
+# Logs published by CI on failure (temporary)
+gradle-build.log
+gradle-failure-snippet.log
+build-failure.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AniBeat</string>
+    <string name="tab_home">Главная</string>
+    <string name="tab_search">Поиск</string>
+    <string name="tab_browse">Обзор</string>
+    <string name="tab_library">Медиатека</string>
+    <string name="period_today">Сегодня</string>
+    <string name="period_week">Неделя</string>
+    <string name="period_all">Всё время</string>
+    <string name="action_play_all">Слушать</string>
+    <string name="action_shuffle">Вперемешку</string>
+    <string name="action_refresh">Обновить</string>
+    <string name="action_radio">Радио</string>
+    <string name="action_download">Скачать</string>
+    <string name="action_offline">Сохранить офлайн</string>
+    <string name="action_video">Видео</string>
+    <string name="action_fullscreen">На весь экран</string>
+    <string name="empty_tracks">Треков пока нет</string>
+    <string name="empty_search">Ничего не найдено</string>
+    <string name="settings">Настройки</string>
+</resources>

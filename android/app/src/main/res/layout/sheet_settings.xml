@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="20dp">
+
+    <TextView style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp" android:text="@string/settings" android:textStyle="bold" android:textSize="17sp" />
+
+    <!-- Иконка, текст и переключатель в одной строке: ничего не «уезжает» -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="10dp">
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:padding="5dp" android:src="@drawable/ic_library" android:contentDescription="@null" />
+        <TextView style="@style/Text.Row" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:text="Русские названия" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/sw_ru" style="@style/Widget.AniBeat.Switch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="10dp">
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:padding="5dp" android:src="@drawable/ic_browse" android:contentDescription="@null" />
+        <TextView style="@style/Text.Row" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:text="Расширенная база" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/sw_extra" style="@style/Widget.AniBeat.Switch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="10dp">
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:padding="5dp" android:src="@drawable/ic_search" android:contentDescription="@null" />
+        <TextView style="@style/Text.Row" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:text="Экономия трафика" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/sw_traffic" style="@style/Widget.AniBeat.Switch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="10dp">
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:padding="5dp" android:src="@drawable/ic_home" android:contentDescription="@null" />
+        <TextView style="@style/Text.Row" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:text="Готовить следующий трек" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/sw_preload" style="@style/Widget.AniBeat.Switch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView android:id="@+id/tv_storage" style="@style/Text.Row.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="20dp" android:paddingTop="12dp" />
+
+    <TextView android:id="@+id/clear_cache" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Очистить кэш" />
+    <TextView android:id="@+id/clear_offline" style="@style/Text.Row" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:text="Удалить офлайн-треки" android:textColor="#FFFF6B62" />
+</LinearLayout>
