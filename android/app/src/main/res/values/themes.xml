@@ -49,6 +49,12 @@
         <item name="trackTint">@color/switch_track</item>
     </style>
 
+    <!-- Базовый текстовый стиль — родитель для Text.Title / Text.Row (требуется AAPT) -->
+    <style name="Text">
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
     <style name="Text.Title">
         <item name="android:textColor">@color/on_surface</item>
         <item name="android:textSize">26sp</item>
