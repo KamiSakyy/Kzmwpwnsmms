@@ -2,6 +2,7 @@ name: Android CI
 
 # Сборка нативного Android-приложения AniBeat (Java, Gradle, SDK 35)
 # Триггеры: пуш в main/arena/*, PR в main, ручной запуск
+# Исправленная версия без android-actions/setup-android (используем предустановленный SDK на ubuntu-latest)
 on:
   push:
     branches: [ "main", "arena/**" ]
@@ -32,22 +33,45 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.9
           cache-read-only: false
 
-      - name: Install Android SDK 35 + Build-Tools
+      - name: Setup Android SDK 35
         run: |
-          echo "SDK root: $ANDROID_SDK_ROOT $ANDROID_HOME"
-          sdkmanager --version
-          yes | sdkmanager --licenses || true
-          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "platform-tools"
-          sdkmanager --list_installed
+          set -e
+          echo "Before: ANDROID_HOME=$ANDROID_HOME ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          # На ubuntu-latest SDK уже предустановлен в $ANDROID_HOME
+          # Проверим sdkmanager
+          if command -v sdkmanager >/dev/null 2>&1; then
+            SDKMANAGER=sdkmanager
+          elif [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          elif [ -x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          else
+            echo "sdkmanager not found, searching..."
+            find $ANDROID_HOME -name sdkmanager 2>/dev/null | head -5
+            SDKMANAGER=$(find $ANDROID_HOME -name sdkmanager 2>/dev/null | head -1)
+          fi
+          echo "Using SDKMANAGER=$SDKMANAGER"
+          $SDKMANAGER --version
+          echo "SDK packages before:"
+          $SDKMANAGER --list_installed 2>&1 | head -100 || true
+          echo "Accepting licenses..."
+          yes | $SDKMANAGER --licenses || true
+          echo "Installing platforms;android-35 and build-tools;35.0.0 ..."
+          $SDKMANAGER --install "platforms;android-35" "build-tools;35.0.0" "platform-tools" || {
+            echo "Install failed, trying with --sdk_root"
+            yes | $SDKMANAGER --sdk_root=$ANDROID_HOME --install "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
+          }
+          echo "SDK packages after:"
+          $SDKMANAGER --list_installed 2>&1 | head -100 || true
+          echo "Setup done. ANDROID_HOME=$ANDROID_HOME"
+          ls -lh $ANDROID_HOME/platforms/android-35/ 2>&1 | head -20 || true
+          ls -lh $ANDROID_HOME/build-tools/35.0.0/ 2>&1 | head -20 || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -58,7 +82,6 @@ jobs:
           set -e
           if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
             echo "gradle-wrapper.jar not found -> generating with gradle wrapper"
-            # gradle уже установлен через gradle/actions/setup-gradle
             gradle wrapper --gradle-version 8.9 --distribution-type bin
             ls -lh gradle/wrapper/
           else
@@ -83,9 +106,9 @@ jobs:
       - name: Build Debug APK
         run: |
           if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew assembleDebug --stacktrace --info
+            ./gradlew assembleDebug --stacktrace
           else
-            gradle assembleDebug --stacktrace --info
+            gradle assembleDebug --stacktrace
           fi
         working-directory: android
 
@@ -102,7 +125,7 @@ jobs:
       - name: List APKs
         run: |
           find android/app/build/outputs -type f -name "*.apk" -o -name "*.aab" | xargs ls -lh || true
-          du -sh android/app/build/outputs/apk/*/* || true
+          du -sh android/app/build/outputs/apk/*/* 2>&1 | head -20 || true
         if: always()
 
       - name: Upload Debug APK
