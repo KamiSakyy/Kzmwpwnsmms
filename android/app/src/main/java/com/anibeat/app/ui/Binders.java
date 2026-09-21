@@ -102,7 +102,7 @@ class SettingsBinder {
         preload.setOnCheckedChangeListener((v, c) -> sp.edit().putBoolean("preloadNext", c).apply());
 
         sheet.findViewById(R.id.clear_cache).setOnClickListener(v -> {
-            com.anibeat.app.api.HttpClient.get().raw().cache().evictAll();
+            try { com.anibeat.app.api.HttpClient.get().raw().cache().evictAll(); } catch (Exception ignored) {}
             sheet.dismiss();
         });
         sheet.findViewById(R.id.clear_offline).setOnClickListener(v -> {
