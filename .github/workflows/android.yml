@@ -158,6 +158,27 @@ jobs:
           cat /tmp/gradle-release.log | tail -n 100 || true
         working-directory: android
 
+      - name: Publish Release APK to handoff/ (only release per user request)
+        if: success()
+        run: |
+          set -e
+          echo "=== Publishing release APK to handoff/ ==="
+          ls -lh android/app/build/outputs/apk/release/ || true
+          mkdir -p handoff
+          # Copy release APK (wildcard, handles -unsigned etc.)
+          RELEASE_APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          echo "Found RELEASE_APK=$RELEASE_APK"
+          cp "$RELEASE_APK" handoff/AniBeat-release.apk
+          ls -lh handoff/ || true
+          du -sh handoff/* || true
+          # Also create latest symlink/copy for direct link clarity
+          echo "=== git push handoff ==="
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f handoff/AniBeat-release.apk
+          git commit -m "chore(handoff): publish release APK [skip ci]" || echo "no commit needed"
+          git push origin HEAD:${{ github.ref_name }} || echo "push handoff failed"
+
       - name: List APKs
         run: |
           find android/app/build/outputs -type f -name "*.apk" -o -name "*.aab" | xargs ls -lh || true
