@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <TextView android:text="AniBeat" style="@style/Text.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:paddingTop="12dp" />
+
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/period_chips"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp" app:singleSelection="true" app:selectionRequired="true">
+            <com.google.android.material.chip.Chip android:id="@+id/chip_today" style="@style/Widget.Material3.Chip.Filter" android:text="@string/period_today" android:checked="false" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_week" style="@style/Widget.Material3.Chip.Filter" android:text="@string/period_week" android:checked="false" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_all" style="@style/Widget.Material3.Chip.Filter" android:text="@string/period_all" android:checked="true" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <com.google.android.material.chip.ChipGroup android:id="@+id/genre_chips" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingHorizontal="12dp" app:singleSelection="true" />
+    </HorizontalScrollView>
+
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp">
+            <com.google.android.material.button.MaterialButton android:id="@+id/refresh" style="@style/Widget.Material3.Button.TonalButton" android:text="@string/action_refresh" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/radio" style="@style/Widget.Material3.Button.TonalButton" android:layout_marginStart="8dp" android:text="@string/action_radio" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/mature_switch" android:layout_marginStart="12dp" android:text="18+" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="12dp" android:paddingBottom="8dp">
+            <com.google.android.material.button.MaterialButton android:id="@+id/mix_shounen" style="@style/Widget.Material3.Button.OutlinedButton" android:text="Сёнэн" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/mix_epic" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_marginStart="8dp" android:text="Эпик" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/mix_chill" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_marginStart="8dp" android:text="Чилл" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/mix_modern" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_marginStart="8dp" android:text="Новая волна" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/mix_classic" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_marginStart="8dp" android:text="Классика" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <ProgressBar android:id="@+id/loading" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:visibility="gone" />
+
+    <TextView android:id="@+id/empty" style="@style/Text.Row.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:padding="24dp" android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingBottom="12dp" />
+</LinearLayout>

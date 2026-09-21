@@ -1,0 +1,135 @@
+name: Android CI
+
+# Сборка нативного Android-приложения AniBeat (Java, Gradle, SDK 35)
+# Триггеры: пуш в main/arena/*, PR в main, ручной запуск
+on:
+  push:
+    branches: [ "main", "arena/**" ]
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build APK (Debug + Release)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.9
+          cache-read-only: false
+
+      - name: Install Android SDK 35 + Build-Tools
+        run: |
+          echo "SDK root: $ANDROID_SDK_ROOT $ANDROID_HOME"
+          sdkmanager --version
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          sdkmanager --list_installed
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: android
+
+      - name: Generate Gradle Wrapper if missing
+        run: |
+          set -e
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "gradle-wrapper.jar not found -> generating with gradle wrapper"
+            # gradle уже установлен через gradle/actions/setup-gradle
+            gradle wrapper --gradle-version 8.9 --distribution-type bin
+            ls -lh gradle/wrapper/
+          else
+            echo "Wrapper present:"
+            ls -lh gradle/wrapper/
+          fi
+          chmod +x gradlew
+          cat gradle/wrapper/gradle-wrapper.properties
+        working-directory: android
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/settings.gradle', 'android/app/build.gradle') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Build Debug APK
+        run: |
+          if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleDebug --stacktrace --info
+          else
+            gradle assembleDebug --stacktrace --info
+          fi
+        working-directory: android
+
+      - name: Build Release APK (unsigned, CI artifact)
+        continue-on-error: true
+        run: |
+          if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleRelease --stacktrace
+          else
+            gradle assembleRelease --stacktrace
+          fi
+        working-directory: android
+
+      - name: List APKs
+        run: |
+          find android/app/build/outputs -type f -name "*.apk" -o -name "*.aab" | xargs ls -lh || true
+          du -sh android/app/build/outputs/apk/*/* || true
+        if: always()
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AniBeat-debug-APK
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Release APK (if built)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AniBeat-release-APK
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload build reports (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-reports
+          path: |
+            android/app/build/reports/**
+            android/build/reports/**
+          if-no-files-found: ignore
+          retention-days: 7
