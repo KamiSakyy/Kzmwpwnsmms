@@ -48,7 +48,7 @@ public final class PlayerController {
     /* ---------------- привязка ExoPlayer ---------------- */
     interface ExoPlayerHolder { Player player(); }
 
-    void attach(Player p) {
+    public void attach(Player p) {
         holder = () -> p;
         p.addListener(new Player.Listener() {
             @Override public void onMediaItemTransition(@Nullable MediaItem item, int reason) {
@@ -65,7 +65,7 @@ public final class PlayerController {
         });
     }
 
-    void detach() { holder = null; }
+    public void detach() { holder = null; }
 
     @Nullable public Player player() { return holder == null ? null : holder.player(); }
 

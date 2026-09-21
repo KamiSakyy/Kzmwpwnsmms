@@ -43,7 +43,11 @@ public final class Api {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i + 1 < kv.length; i += 2) {
             if (sb.length() > 0) sb.append('&');
-            sb.append(okhttp3.HttpUrl.encode(kv[i])).append('=').append(okhttp3.HttpUrl.encode(kv[i + 1]));
+            try {
+                sb.append(java.net.URLEncoder.encode(kv[i], "UTF-8")).append('=').append(java.net.URLEncoder.encode(kv[i + 1], "UTF-8"));
+            } catch (Exception e) {
+                sb.append(kv[i]).append('=').append(kv[i + 1]);
+            }
         }
         return sb.toString();
     }
@@ -81,7 +85,7 @@ public final class Api {
                 "fields[anime]", F_ANIME, "fields[animetheme]", F_THEME, "fields[song]", F_SONG,
                 "fields[artist]", F_ARTIST, "fields[animethemeentry]", F_ENTRY, "fields[video]", F_VIDEO,
                 "fields[audio]", F_AUDIO, "fields[image]", F_IMAGE);
-        HttpClient.get().get(url, json(json.get(), cb, count));
+        HttpClient.get().get(url, json(count, cb));
     }
 
     /**
@@ -134,7 +138,7 @@ public final class Api {
         HttpClient.get().get(url, new HttpClient.Json() {
             @Override public void ok(String body) {
                 Map<String, AnimeSummary> map = new LinkedHashMap<>();
-                for (JsonElement e : arr(obj(body), "anime")) map.put(str(e, "slug"), toSummary(e.getAsJsonObject()));
+                for (JsonElement e : arr(obj(body), "anime")) map.put(str(e.getAsJsonObject(), "slug"), toSummary(e.getAsJsonObject()));
                 List<AnimeSummary> out = new ArrayList<>();
                 for (String s : slugs) if (map.containsKey(s)) out.add(map.get(s));
                 cb.ok(out);
@@ -152,7 +156,7 @@ public final class Api {
         HttpClient.get().get(url, new HttpClient.Json() {
             @Override public void ok(String body) {
                 Map<String, JsonObject> bySlug = new HashMap<>();
-                for (JsonElement e : arr(obj(body), "anime")) bySlug.put(str(e, "slug"), e.getAsJsonObject());
+                for (JsonElement e : arr(obj(body), "anime")) bySlug.put(str(e.getAsJsonObject(), "slug"), e.getAsJsonObject());
                 List<Track> out = new ArrayList<>();
                 for (String s : slugs) {
                     JsonObject a = bySlug.get(s);
@@ -166,7 +170,7 @@ public final class Api {
 
     /** Страница аниме: описание + все версии тем. */
     public static void animeDetail(String slug, DetailCb cb) {
-        String url = BASE + "anime/" + okhttp3.HttpUrl.encode(slug) + "?" + q(
+        String url = BASE + "anime/" + encode(slug) + "?" + q(
                 "include", INC_ANIME + ",studios,series",
                 "fields[anime]", F_ANIME + ",synopsis", "fields[studio]", "name,slug", "fields[series]", "name,slug",
                 "fields[animetheme]", F_THEME, "fields[song]", F_SONG, "fields[artist]", F_ARTIST,
@@ -477,6 +481,11 @@ public final class Api {
             sb.append(s);
         }
         return sb.toString();
+    }
+
+
+    private static String encode(String s) {
+        try { return java.net.URLEncoder.encode(s, "UTF-8").replace("+", "%20"); } catch (Exception e) { return s; }
     }
 
     private static String iso(long millis) {
