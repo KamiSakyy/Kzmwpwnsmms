@@ -94,9 +94,10 @@ public final class Api {
      */
     public static void freshTracks(String period, int count, TracksCb cb) {
         long now = System.currentTimeMillis();
-        String since = null;
-        if ("today".equals(period)) since = iso(now - (now % 86_400_000L));
-        else if ("week".equals(period)) since = iso(now - 7L * 86_400_000L);
+        String sinceTmp = null;
+        if ("today".equals(period)) sinceTmp = iso(now - (now % 86_400_000L));
+        else if ("week".equals(period)) sinceTmp = iso(now - 7L * 86_400_000L);
+        final String since = sinceTmp;
 
         TracksCb withFallback = new TracksCb() {
             @Override public void ok(List<Track> tracks) {
