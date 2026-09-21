@@ -77,6 +77,38 @@ jobs:
           ls -lh $ANDROID_HOME/platforms/android-35/ 2>&1 | head -20 || true
           ls -lh $ANDROID_HOME/build-tools/35.0.0/ 2>&1 | head -20 || true
 
+      - name: Generate release keystore (for signed APK)
+        run: |
+          set -e
+          # Создаём release.keystore один раз — потом коммитим, чтобы подпись была стабильной
+          if [ -f "android/app/release.keystore" ]; then
+            echo "release.keystore already exists"
+            ls -lh android/app/release.keystore
+          else
+            echo "Generating release.keystore..."
+            mkdir -p android/app
+            keytool -genkeypair -v -keystore android/app/release.keystore -storetype PKCS12 \
+              -storepass anibeat123 -alias anibeat -keypass anibeat123 \
+              -dname "CN=AniBeat, OU=AniBeat, O=AniBeat, L=Aachen, S=NRW, C=DE" \
+              -validity 10000 -keyalg RSA -keysize 2048
+            ls -lh android/app/release.keystore
+            keytool -list -v -keystore android/app/release.keystore -storepass anibeat123 -alias anibeat | head -20
+            # Коммитим keystore, чтобы следующие сборки использовали тот же ключ (детерминированная подпись)
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -f android/app/release.keystore
+            git commit -m "chore: add release keystore for signed APK [skip ci]" || echo "no commit"
+            git push origin HEAD:${{ github.ref_name }} || echo "push keystore failed (will use generated one for this build)"
+          fi
+          # Также убедимся, что debug keystore существует для совместимости (нужен как fallback)
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            echo "Generating debug keystore..."
+            keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          ls -lh android/app/release.keystore ~/.android/debug.keystore 2>&1 | head -20
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         working-directory: android

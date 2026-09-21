@@ -15,13 +15,46 @@ android {
         resConfigs "ru", "en"
     }
 
+    signingConfigs {
+        release {
+            // Подписываем релиз тем же debug-ключом для CI (APK сразу устанавливается).
+            // Для продакшна замените на свой keystore:
+            //  1) положите файл в android/app/release.keystore
+            //  2) задайте в workflow secrets ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+            //     либо укажите путь через свойство RELEASE_STORE_FILE
+            def customStore = file("release.keystore")
+            def envPath = System.getenv("ANDROID_KEYSTORE_PATH")
+            def storePath = customStore.exists() ? customStore.absolutePath : (envPath ?: "${System.getProperty('user.home')}/.android/debug.keystore")
+            def ksFile = file(storePath)
+            // Если файл ещё не существует (первый запуск), Gradle создаст debug keystore при сборке debug — для release подождёт
+            if (ksFile.exists()) {
+                storeFile ksFile
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: (customStore.exists() ? "anibeat123" : "android")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS") ?: (customStore.exists() ? "anibeat" : "androiddebugkey")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD") ?: (customStore.exists() ? "anibeat123" : "android")
+                println("Signing release with: ${ksFile} alias=${keyAlias}")
+            } else {
+                // Fallback: используем debug signingConfig (будет создан при assembleDebug)
+                println("Release keystore not found at ${ksFile}, will fallback to debug after first build")
+                // Не падаем — вторую попытку сделает workflow (build debug → build release)
+            }
+            // v1 + v2 signing (совместимо с Android 6+)
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Для CI собираем release как debug-подписанный, чтобы артефакт был доступен без своего keystore.
-            // Для продакшна добавьте свой signingConfigs.release и укажите ANDROID_KEYSTORE_* secrets.
+            // Подписываем релиз — теперь APK устанавливается напрямую
+            try {
+                signingConfig signingConfigs.release
+            } catch (Exception e) {
+                println("Warning: release signing not configured, APK будет unsigned: ${e.message}")
+            }
         }
         debug {
             applicationIdSuffix ".debug"
